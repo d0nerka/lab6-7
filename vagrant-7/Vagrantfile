@@ -1,0 +1,22 @@
+ENV["VAGRANT_DEFAULT_PROVIDER"] = "docker"
+Vagrant.configure("2") do |config|
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.define "db" do |db|
+    db.vm.provider "docker" do |d|
+      d.image = "postgres:16-alpine"
+      d.name  = "db-7"
+      d.env = { "POSTGRES_USER" => "appuser", "POSTGRES_PASSWORD" => "pass-7", "POSTGRES_DB" => "appdb" }
+      d.create_args = ["--network=devnet-7", "-v", "pgdata-7:/var/lib/postgresql/data"]
+    end
+  end
+  config.vm.define "web" do |web|
+    web.vm.provider "docker" do |d|
+      d.image = "lab5-7:1.0"
+      d.name  = "web-7"
+      d.ports = ["8707:5000"]
+      d.env = { "GREETING" => "Hello", "STUDENT" => "Aidarov", "VARIANT" => "7",
+                "DB_HOST" => "db-7", "DB_NAME" => "appdb", "DB_USER" => "appuser", "DB_PASSWORD" => "pass-7" }
+      d.create_args = ["--network=devnet-7"]
+    end
+  end
+end

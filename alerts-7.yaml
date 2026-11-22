@@ -1,0 +1,19 @@
+serverFiles:
+  alerting_rules.yml:
+    groups:
+    - name: lab6-7
+      rules:
+      - alert: AppDown
+        expr: kube_deployment_status_replicas_available{namespace="lab6-7",deployment="lab6-7"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "lab6-7: бірде-бір Pod жұмыс істемейді"
+      - alert: AppUnavailableReplicas
+        expr: kube_deployment_status_replicas_unavailable{namespace="lab6-7",deployment="lab6-7"} > 0
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "lab6-7: дайын емес Pod бар"
